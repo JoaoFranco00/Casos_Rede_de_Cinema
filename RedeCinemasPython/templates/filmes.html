@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Rede de Cinemas – Filmes</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #1a1a2e; color: #eee; margin: 0; }
+        nav { background: #16213e; padding: 12px 30px; display: flex; gap: 20px; }
+        nav a { color: #e94560; text-decoration: none; font-weight: bold; font-size: 15px; }
+        nav a:hover { text-decoration: underline; }
+        .container { max-width: 960px; margin: 30px auto; padding: 0 20px; }
+        h1, h2 { color: #e94560; }
+        .card { background: #16213e; border-radius: 10px; padding: 24px; margin-bottom: 28px; }
+        label { display: block; margin: 8px 0 4px; font-size: 13px; color: #aaa; }
+        input, textarea { width: 100%; padding: 9px; border-radius: 6px; border: none;
+                background: #0f3460; color: #eee; margin-bottom: 4px; }
+        textarea { min-height: 70px; resize: vertical; }
+        .row { display: flex; gap: 14px; }
+        .row > div { flex: 1; }
+        button { background: #e94560; color: white; border: none; padding: 10px 24px;
+                 border-radius: 6px; cursor: pointer; font-size: 14px; margin-top: 10px; }
+        button:hover { background: #c73652; }
+        .msg-ok  { background: #1e4620; color: #8dff90; padding: 10px; border-radius: 6px; margin-bottom: 14px; }
+        .msg-err { background: #4a1010; color: #ff8d8d; padding: 10px; border-radius: 6px; margin-bottom: 14px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { background: #0f3460; color: #e94560; padding: 10px; text-align: left; }
+        td { padding: 9px 10px; border-bottom: 1px solid #222; font-size: 13px; }
+        tr:hover td { background: #0d2b52; }
+        .total { color: #e94560; font-weight: bold; }
+        .tag { background: #0f3460; border-radius: 4px; padding: 2px 7px;
+               font-size: 11px; display: inline-block; margin: 1px; }
+        small { color: #888; }
+    </style>
+</head>
+<body>
+<nav>
+    <a href="/">🎬 Sessões</a>
+    <a href="/cinemas">🏛️ Cinemas</a>
+    <a href="/filmes">🎥 Filmes</a>
+</nav>
+
+<div class="container">
+    <h1>Gerenciar Filmes</h1>
+
+    {% if mensagem %}<div class="msg-ok">✅ {{ mensagem }}</div>{% endif %}
+    {% if erro %}<div class="msg-err">❌ {{ erro }}</div>{% endif %}
+
+    <!-- Formulário: Novo Filme -->
+    <div class="card">
+        <h2>Novo Filme</h2>
+        <form method="POST" action="/filmes/novo">
+            <div class="row">
+                <div>
+                    <label>Título</label>
+                    <input type="text" name="titulo" placeholder="Ex: Matrix" required>
+                </div>
+                <div>
+                    <label>Duração (min)</label>
+                    <input type="number" name="duracao_min" min="60" placeholder="Ex: 120" required>
+                </div>
+            </div>
+            <label>Sinopse</label>
+            <textarea name="sinopse" placeholder="Resumo do filme..."></textarea>
+            <label>Gêneros <small>(separados por vírgula)</small></label>
+            <input type="text" name="generos" placeholder="Ex: Ação, Ficção Científica" required>
+            <label>Diretores <small>(separados por vírgula)</small></label>
+            <input type="text" name="diretores" placeholder="Ex: Lana Wachowski, Lilly Wachowski" required>
+            <label>Atores <small>(separados por vírgula)</small></label>
+            <input type="text" name="atores" placeholder="Ex: Keanu Reeves, Laurence Fishburne" required>
+            <button type="submit">Cadastrar Filme</button>
+        </form>
+    </div>
+
+    <!-- Tabela de Filmes -->
+    <div class="card">
+        <h2>Filmes Cadastrados</h2>
+        {% if filmes %}
+        <table>
+            <tr>
+                <th>ID</th><th>Título</th><th>Duração</th><th>Gêneros</th>
+                <th>Diretores</th><th>Elenco</th><th>Total Público</th>
+            </tr>
+            {% for f in filmes %}
+            <tr>
+                <td>{{ f.id }}</td>
+                <td><strong>{{ f.titulo }}</strong></td>
+                <td>{{ f.duracao_min }}min</td>
+                <td>{% for g in f.generos %}<span class="tag">{{ g }}</span>{% endfor %}</td>
+                <td>{{ f.diretores | join(", ") }}</td>
+                <td>{{ f.atores | join(", ") }}</td>
+                <td class="total">{{ totais[f.id] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+        <p>Nenhum filme cadastrado ainda.</p>
+        {% endif %}
+    </div>
+</div>
+</body>
+</html>

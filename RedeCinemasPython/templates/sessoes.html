@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Rede de Cinemas – Sessões</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #1a1a2e; color: #eee; margin: 0; }
+        nav { background: #16213e; padding: 12px 30px; display: flex; gap: 20px; }
+        nav a { color: #e94560; text-decoration: none; font-weight: bold; font-size: 15px; }
+        nav a:hover { text-decoration: underline; }
+        .container { max-width: 960px; margin: 30px auto; padding: 0 20px; }
+        h1, h2 { color: #e94560; }
+        .card { background: #16213e; border-radius: 10px; padding: 24px; margin-bottom: 28px; }
+        label { display: block; margin: 8px 0 4px; font-size: 13px; color: #aaa; }
+        input, select { width: 100%; padding: 9px; border-radius: 6px; border: none;
+                        background: #0f3460; color: #eee; margin-bottom: 4px; }
+        .row { display: flex; gap: 14px; }
+        .row > div { flex: 1; }
+        button { background: #e94560; color: white; border: none; padding: 10px 24px;
+                 border-radius: 6px; cursor: pointer; font-size: 14px; margin-top: 10px; }
+        button:hover { background: #c73652; }
+        .msg-ok  { background: #1e4620; color: #8dff90; padding: 10px; border-radius: 6px; margin-bottom: 14px; }
+        .msg-err { background: #4a1010; color: #ff8d8d; padding: 10px; border-radius: 6px; margin-bottom: 14px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { background: #0f3460; color: #e94560; padding: 10px; text-align: left; }
+        td { padding: 9px 10px; border-bottom: 1px solid #222; }
+        tr:hover td { background: #0d2b52; }
+        .badge { background: #0f3460; border-radius: 4px; padding: 2px 8px; font-size: 12px; }
+    </style>
+</head>
+<body>
+<nav>
+    <a href="/">🎬 Sessões</a>
+    <a href="/cinemas">🏛️ Cinemas</a>
+    <a href="/filmes">🎥 Filmes</a>
+</nav>
+
+<div class="container">
+    <h1>Gerenciar Sessões</h1>
+
+    {% if mensagem %}<div class="msg-ok">✅ {{ mensagem }}</div>{% endif %}
+    {% if erro %}<div class="msg-err">❌ {{ erro }}</div>{% endif %}
+
+    <!-- Formulário: Nova Sessão -->
+    <div class="card">
+        <h2>Nova Sessão</h2>
+        <form method="POST" action="/sessoes/nova">
+            <div class="row">
+                <div>
+                    <label>Cinema</label>
+                    <select name="cinema_id" required>
+                        <option value="">Selecione...</option>
+                        {% for c in (cinemas or []) %}
+                        <option value="{{ c.id }}">{{ c.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label>Filme</label>
+                    <select name="filme_id" required>
+                        <option value="">Selecione...</option>
+                        {% for f in (filmes or []) %}
+                        <option value="{{ f.id }}">{{ f.titulo }} ({{ f.duracao_min }}min)</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div>
+                    <label>Data e Hora</label>
+                    <input type="datetime-local" name="data_hora" required>
+                </div>
+                <div>
+                    <label>Sala</label>
+                    <input type="text" name="sala" placeholder="Ex: Sala 1" required>
+                </div>
+            </div>
+            <button type="submit">Cadastrar Sessão</button>
+        </form>
+    </div>
+
+    <!-- Formulário: Registrar Público -->
+    <div class="card">
+        <h2>Registrar Público</h2>
+        <form method="POST" action="/sessoes/publico">
+            <div class="row">
+                <div>
+                    <label>Sessão</label>
+                    <select name="sessao_id" required>
+                        <option value="">Selecione...</option>
+                        {% for s in sessoes %}
+                        <option value="{{ s.id }}">
+                            #{{ s.id }} – {{ s.filme_titulo }} | {{ s.cinema_nome }} | {{ s.data_hora }} | Sala {{ s.sala }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label>Público</label>
+                    <input type="number" name="publico" min="0" placeholder="Quantidade de pessoas" required>
+                </div>
+            </div>
+            <button type="submit">Registrar Público</button>
+        </form>
+    </div>
+
+    <!-- Tabela de Sessões -->
+    <div class="card">
+        <h2>Sessões Cadastradas</h2>
+        {% if sessoes %}
+        <table>
+            <tr>
+                <th>ID</th><th>Filme</th><th>Cinema</th>
+                <th>Data/Hora</th><th>Sala</th><th>Público</th>
+            </tr>
+            {% for s in sessoes %}
+            <tr>
+                <td><span class="badge">#{{ s.id }}</span></td>
+                <td>{{ s.filme_titulo }}</td>
+                <td>{{ s.cinema_nome }}</td>
+                <td>{{ s.data_hora }}</td>
+                <td>{{ s.sala }}</td>
+                <td>{{ s.publico }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+        <p>Nenhuma sessão cadastrada ainda.</p>
+        {% endif %}
+    </div>
+</div>
+</body>
+</html>

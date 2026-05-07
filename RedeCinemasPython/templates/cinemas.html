@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Rede de Cinemas – Cinemas</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #1a1a2e; color: #eee; margin: 0; }
+        nav { background: #16213e; padding: 12px 30px; display: flex; gap: 20px; }
+        nav a { color: #e94560; text-decoration: none; font-weight: bold; font-size: 15px; }
+        nav a:hover { text-decoration: underline; }
+        .container { max-width: 960px; margin: 30px auto; padding: 0 20px; }
+        h1, h2 { color: #e94560; }
+        .card { background: #16213e; border-radius: 10px; padding: 24px; margin-bottom: 28px; }
+        label { display: block; margin: 8px 0 4px; font-size: 13px; color: #aaa; }
+        input { width: 100%; padding: 9px; border-radius: 6px; border: none;
+                background: #0f3460; color: #eee; margin-bottom: 4px; }
+        .row { display: flex; gap: 14px; }
+        .row > div { flex: 1; }
+        button { background: #e94560; color: white; border: none; padding: 10px 24px;
+                 border-radius: 6px; cursor: pointer; font-size: 14px; margin-top: 10px; }
+        button:hover { background: #c73652; }
+        .msg-ok  { background: #1e4620; color: #8dff90; padding: 10px; border-radius: 6px; margin-bottom: 14px; }
+        .msg-err { background: #4a1010; color: #ff8d8d; padding: 10px; border-radius: 6px; margin-bottom: 14px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { background: #0f3460; color: #e94560; padding: 10px; text-align: left; }
+        td { padding: 9px 10px; border-bottom: 1px solid #222; }
+        tr:hover td { background: #0d2b52; }
+        .total { color: #e94560; font-weight: bold; }
+    </style>
+</head>
+<body>
+<nav>
+    <a href="/">🎬 Sessões</a>
+    <a href="/cinemas">🏛️ Cinemas</a>
+    <a href="/filmes">🎥 Filmes</a>
+</nav>
+
+<div class="container">
+    <h1>Gerenciar Cinemas</h1>
+
+    {% if mensagem %}<div class="msg-ok">✅ {{ mensagem }}</div>{% endif %}
+    {% if erro %}<div class="msg-err">❌ {{ erro }}</div>{% endif %}
+
+    <!-- Formulário: Novo Cinema -->
+    <div class="card">
+        <h2>Novo Cinema</h2>
+        <form method="POST" action="/cinemas/novo">
+            <label>Nome</label>
+            <input type="text" name="nome" placeholder="Ex: Cinemark Shopping" required>
+            <label>Endereço</label>
+            <input type="text" name="endereco" placeholder="Ex: Av. Paulista, 1000 – São Paulo/SP" required>
+            <label>Capacidade</label>
+            <input type="number" name="capacidade" min="1" placeholder="Ex: 300" required>
+            <button type="submit">Cadastrar Cinema</button>
+        </form>
+    </div>
+
+    <!-- Tabela de Cinemas -->
+    <div class="card">
+        <h2>Cinemas Cadastrados</h2>
+        {% if cinemas %}
+        <table>
+            <tr>
+                <th>ID</th><th>Nome</th><th>Endereço</th>
+                <th>Capacidade</th><th>Total de Público</th>
+            </tr>
+            {% for c in cinemas %}
+            <tr>
+                <td>{{ c.id }}</td>
+                <td>{{ c.nome }}</td>
+                <td>{{ c.endereco }}</td>
+                <td>{{ c.capacidade }}</td>
+                <td class="total">{{ totais[c.id] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+        <p>Nenhum cinema cadastrado ainda.</p>
+        {% endif %}
+    </div>
+</div>
+</body>
+</html>
